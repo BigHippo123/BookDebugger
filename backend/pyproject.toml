@@ -9,4 +9,7 @@ dependencies = [
     "flask>=3.1.2",
     "faiss-cpu>=1.13.0",
     "flask-cors>=6.0.2",
+    "nltk>=3.9.2",
+    "gensim>=4.4.0",
+    "numpy>=2.0.2",
 ]
