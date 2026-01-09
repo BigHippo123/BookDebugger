@@ -14,7 +14,8 @@ const TextAnalyzer = () => {
   const [highlightedWords, setHighlightedWords] = useState(new Set());
   const hoverTimeoutRef = React.useRef(null);
 
-  const API_BASE = 'http://localhost:5000';
+  // const API_BASE = 'http://localhost:5000';
+  const API_BASE = 'https://bookdebuggerbackend.onrender.com';
 
   // Process text into paragraphs and track word positions
   const processedText = useMemo(() => {
