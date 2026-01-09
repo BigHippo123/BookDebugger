@@ -43,13 +43,13 @@ except LookupError:
 
 # Load pre-trained Word2Vec model (using smaller model for faster loading)
 # Options: 'word2vec-google-news-300', 'glove-wiki-gigaword-100', 'glove-twitter-25'
-print("Loading Word2Vec model... (this may take a minute on first run)")
-try:
-    word2vec_model = api.load('glove-wiki-gigaword-100')  # 100-dim vectors, faster
-    print("Word2Vec model loaded successfully!")
-except Exception as e:
-    print(f"Warning: Could not load Word2Vec model: {e}")
-    word2vec_model = None
+# print("Loading Word2Vec model... (this may take a minute on first run)")
+# try:
+#     word2vec_model = api.load('glove-wiki-gigaword-100')  # 100-dim vectors, faster
+#     print("Word2Vec model loaded successfully!")
+# except Exception as e:
+#     print(f"Warning: Could not load Word2Vec model: {e}")
+word2vec_model = None
 
 # Rate limiting
 limiter = Limiter(
@@ -88,20 +88,21 @@ def sanitize_text(text):
     return text
 
 def get_word_embedding(word):
-    """Get word embedding vector for a word"""
-    if word2vec_model is None:
-        return None
+    pass
+    # """Get word embedding vector for a word"""
+    # if word2vec_model is None:
+    #     return None
     
-    try:
-        # Word2Vec models are case-sensitive, try lowercase first
-        if word.lower() in word2vec_model:
-            return word2vec_model[word.lower()].tolist()
-        elif word in word2vec_model:
-            return word2vec_model[word].tolist()
-        else:
-            return None
-    except:
-        return None
+    # try:
+    #     # Word2Vec models are case-sensitive, try lowercase first
+    #     if word.lower() in word2vec_model:
+    #         return word2vec_model[word.lower()].tolist()
+    #     elif word in word2vec_model:
+    #         return word2vec_model[word].tolist()
+    #     else:
+    #         return None
+    # except:
+    #     return None
 
 def process_text(text, include_embeddings=True):
     """Process text using NLTK and calculate statistics with embeddings"""
@@ -144,6 +145,7 @@ def process_text(text, include_embeddings=True):
 
     # Build word dictionary with embeddings
     word_dictionary = {}
+    words_neighbors = {}
     for word, count in word_freq.items():
         word_entry = {
             'count': count,
@@ -176,24 +178,24 @@ def process_text(text, include_embeddings=True):
         if embeddings:
             document_embedding = np.mean(embeddings, axis=0).tolist()
     
-    # Calculate nearest neighbrs to each word in the document
-    print(np.array(embeddings).shape)
-    n = 10
-    index = faiss.IndexFlatL2(word2vec_model.vector_size)
-    index.add(np.array(embeddings).astype('float32'))
-    D, I = index.search(np.array(embeddings).astype('float32'), n)  # Top n nearest neighbors
+        # Calculate nearest neighbrs to each word in the document
+        print(np.array(embeddings).shape)
+        n = 10
+        index = faiss.IndexFlatL2(word2vec_model.vector_size)
+        index.add(np.array(embeddings).astype('float32'))
+        D, I = index.search(np.array(embeddings).astype('float32'), n)  # Top n nearest neighbors
 
-    words_neighbors = {}
-    for i, word in enumerate(words_list):
-        neighbors = []
-        for j in range(1, n):  # Skip the first one (itself)
-            neighbor_idx = I[i][j]
-            neighbor_word = words_list[neighbor_idx]
-            neighbors.append({
-                'word': neighbor_word,
-                'distance': float(D[i][j])
-            })
-        words_neighbors[word] = neighbors
+
+        for i, word in enumerate(words_list):
+            neighbors = []
+            for j in range(1, n):  # Skip the first one (itself)
+                neighbor_idx = I[i][j]
+                neighbor_word = words_list[neighbor_idx]
+                neighbors.append({
+                    'word': neighbor_word,
+                    'distance': float(D[i][j])
+                })
+            words_neighbors[word] = neighbors
 
 
     result = {
@@ -377,8 +379,8 @@ def word_similarity():
         if not word1 or not word2:
             return jsonify({'error': 'Both word1 and word2 are required'}), 400
         
-        if word2vec_model is None:
-            return jsonify({'error': 'Word2Vec model not loaded'}), 503
+        # if word2vec_model is None:
+        #     return jsonify({'error': 'Word2Vec model not loaded'}), 503
         
         try:
             similarity = word2vec_model.similarity(word1, word2)
