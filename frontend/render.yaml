@@ -1,9 +1,9 @@
 services:
   - type: web
-    name: frontend
+    name: my-frontend
     env: static
-    buildCommand: npm install && npm run build
-    staticPublishPath: ./dist
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: frontend/dist
     routes:
       - type: rewrite
         source: /*
