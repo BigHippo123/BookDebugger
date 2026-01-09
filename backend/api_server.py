@@ -35,6 +35,11 @@ try:
     nltk.data.find('tokenizers/punkt')
 except LookupError:
     nltk.download('punkt')
+
+try:
+    nltk.data.find('tokenizers/punkt_tab')
+except LookupError:
+    nltk.download('punkt_tab')
     
 try:
     nltk.data.find('corpora/stopwords')
@@ -220,6 +225,22 @@ def process_text(text, include_embeddings=True):
         result['embedding_coverage'] = round(len([w for w in content_words if get_word_embedding(w) is not None]) / len(content_words), 2) if content_words else 0
     
     return result
+
+@app.route('/')
+def home():
+    """Root endpoint"""
+    return jsonify({
+        'message': 'Book Debugger API is running',
+        'status': 'ok',
+        'version': '1.0',
+        'endpoints': {
+            'health': '/health',
+            'process_text': '/api/process (POST)',
+            'process_file': '/api/process/file (POST)',
+            'word_info': '/api/word/<word> (GET)',
+            'similarity': '/api/similarity (POST)'
+        }
+    })
 
 @app.route('/health', methods=['GET'])
 def health_check():
