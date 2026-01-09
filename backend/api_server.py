@@ -17,16 +17,17 @@ from flask_cors import CORS
 
 app = Flask(__name__)
 # Allow your frontend to make requests
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",  # Local development
-        "https://bookdebugger.onrender.com"  # Your Render frontend URL
-    ],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+CORS(app, resources={
+    r"/*": {
+        "origins": [
+            "http://localhost:3001",
+            "https://bookdebugger.onrender.com"
+        ],
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"],
+        "supports_credentials": True
+    }
+})
 app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024  # 10MB limit
 
 # Download required NLTK data
